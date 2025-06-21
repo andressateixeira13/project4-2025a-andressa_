@@ -14,19 +14,15 @@
 Acesso: Substitua este texto pela URL de deploy do projeto
 
 
-### Desenvolvedores
+### Desenvolvedora
 Andressa Teixeira
 
 
 ### Nosso produto
 
-Sistema Web de um tutor inteligente/Chat. A expectativa é que o aluno consiga fazer questões ao chat, ele responda corretamente e que produza um quiz ao final da conversa para reforçar os conhecimentos. 
-
 
 
 ### Desenvolvimento
-
-- Projeto sendo iniciado por duas frentes: Visualização, onde irei fazer um prototipo de baixa fidelidade para alinhar, e integração, utilizando RAG para a IA produzir as respostas baseada nos dados de uma ontologia.
 
 
 #### Tecnologias
@@ -34,19 +30,20 @@ Sistema Web de um tutor inteligente/Chat. A expectativa é que o aluno consiga f
 Substitua este trecho por uma lista detalhada de tecnologias usadas (tanto as básicas, como HTML e CSS, como as mais específicas, por exemplo algum framework, biblioteca, etc.):
 - HTML
 - CSS
-- Python (para lidar com a integração)
+- React/Vite
+- Supabase
 
 #### Ambiente de desenvolvimento
 
 Substitua este trecho por uma lista detalhada dos ambientes/ferramentas de desenvolvimento utilizadas (por exemplo, VS Code + alguma extensão, etc.)
 - VS Code
-- ...
+- Supabase
 
 #### Referências e créditos
 
 Substitua este trecho por uma lista bem detalhada de todo material consultado para ajudar no projeto, por exemplo:  URL de templates usados, URL de icon kits usados, créditos para colegas que colaboraram, geradores de código (incluindo alguns prompts usados para o ChatGPT, se for o caso)
-- ...
-- ...
+- https://developers.google.com/identity/sign-in/web/sign-in?hl=pt-br
+- https://cloud.google.com/identity-platform/docs/web/google?hl=pt-br
 
 
 
