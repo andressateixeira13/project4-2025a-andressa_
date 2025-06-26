@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { supabase } from "../services/supabase.js";
+import "style.css";
 
 function UploadPage() {
   const [usuario, setUsuario] = useState(null);
@@ -8,11 +9,15 @@ function UploadPage() {
   const [texto, setTexto] = useState("");
   const [resumo, setResumo] = useState("");
   const [questoes, setQuestoes] = useState([]);
+  const [respostas, setRespostas] = useState({});
+  const [verificado, setVerificado] = useState(false);
   const [carregando, setCarregando] = useState(false);
 
   useEffect(() => {
     const verificarLogin = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) setUsuario(user);
     };
     verificarLogin();
@@ -25,6 +30,8 @@ function UploadPage() {
     setCarregando(true);
     setResumo("");
     setQuestoes([]);
+    setRespostas({});
+    setVerificado(false);
 
     try {
       let response;
@@ -59,73 +66,109 @@ function UploadPage() {
     }
   };
 
+  const handleAlternativa = (index, letra) => {
+    if (!verificado) {
+      setRespostas((prev) => ({ ...prev, [index]: letra }));
+    }
+  };
+
+  const verificarRespostas = () => {
+    setVerificado(true);
+  };
+
   return (
-    <div className="container py-5">
-      <h2 className="text-center mb-4">Gerador de Resumo e Questões</h2>
-
-      <form onSubmit={handleSubmit} className="mb-4">
-        <div className="mb-3">
-          <label className="form-label">Upload de PDF:</label>
-          <input
-            type="file"
-            accept="application/pdf"
-            className="form-control"
-            onChange={(e) => {
-              setArquivo(e.target.files[0]);
-              setTexto(""); // limpa o texto se PDF for enviado
-            }}
-          />
+    <div>
+      <header className="d-flex justify-content-between align-items-center p-3 border-bottom">
+        <div className="d-flex gap-3">
+          <a href="#" className="nav-link">Resumos Salvos</a>
+          <a href="#" className="nav-link">Novo Resumo</a>
         </div>
+        {usuario && (
+          <div className="d-flex align-items-center gap-2">
+            <img src={`https://github.com/${usuario.user_metadata?.user_name}.png`} className="user-avatar" />
+            <span>{usuario.user_metadata?.full_name}</span>
+            <button className="btn btn-outline-danger btn-sm" onClick={() => supabase.auth.signOut()}>Sair</button>
+          </div>
+        )}
+      </header>
 
-        <div className="mb-3">
-          <label className="form-label">Ou digite o texto abaixo:</label>
-          <textarea
-            className="form-control"
-            rows="6"
-            value={texto}
-            placeholder="Cole seu texto aqui..."
-            onChange={(e) => {
-              setTexto(e.target.value);
-              setArquivo(null); // limpa o arquivo se texto for escrito
-            }}
-          />
-        </div>
+      <div className="container py-5">
+        <h2 className="text-center mb-4">Gerador de Resumo e Questões</h2>
 
-        <button className="btn btn-primary w-100" disabled={carregando}>
-          {carregando ? "Processando..." : "Gerar Resumo e Questões"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit} className="mb-4">
+          <div className="mb-3">
+            <label className="form-label">Upload de PDF:</label>
+            <input
+              type="file"
+              accept="application/pdf"
+              className="form-control"
+              onChange={(e) => {
+                setArquivo(e.target.files[0]);
+                setTexto("");
+              }}
+            />
+          </div>
 
-      {resumo && (
-        <div className="mb-4">
-          <h4>Resumo:</h4>
-          <div className="p-3 bg-light border rounded">{resumo}</div>
-        </div>
-      )}
+          <div className="mb-3">
+            <label className="form-label">Ou digite o texto abaixo:</label>
+            <textarea
+              className="form-control"
+              rows="6"
+              value={texto}
+              placeholder="Digite texto aqui..."
+              onChange={(e) => {
+                setTexto(e.target.value);
+                setArquivo(null);
+              }}
+            />
+          </div>
 
-      {questoes.length > 0 && (
-        <div>
-          <h4>Questões:</h4>
-          {questoes.map((q, i) => (
-            <div key={i} className="mb-3 p-3 border rounded bg-white">
-              <strong>{i + 1}. {q.pergunta}</strong>
-              <ul className="mt-2">
-                {q.alternativas.map((alt, j) => {
-                  const letra = String.fromCharCode(65 + j);
-                  return (
-                    <li key={letra}>
-                      <strong>{letra}.</strong>{" "}
-                      <span style={{ color: letra === q.correta ? "green" : "inherit", fontWeight: letra === q.correta ? "bold" : "normal" }}>
-                        {alt}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
+          <button className="btn btn-primary w-100" disabled={carregando}>
+            {carregando ? "Processando..." : "Gerar Resumo e Questões"}
+          </button>
+        </form>
+
+        {resumo && (
+          <div className="mb-4">
+            <h4>Resumo:</h4>
+            <div className="p-3 bg-light border rounded">{resumo}</div>
+          </div>
+        )}
+
+        {questoes.length > 0 && (
+          <div>
+            <h4>Questões:</h4>
+            {questoes.map((q, i) => (
+              <div key={i} className="mb-3 p-3 border rounded bg-white">
+                <strong>{i + 1}. {q.pergunta}</strong>
+                <ul className="mt-2 list-unstyled">
+                  {q.alternativas.map((alt, j) => {
+                    const letra = String.fromCharCode(65 + j);
+                    const selecionada = respostas[i] === letra;
+                    const correta = verificado && letra === q.correta;
+                    const incorreta = verificado && selecionada && letra !== q.correta;
+
+                    return (
+                      <li
+                        key={letra}
+                        className={`alternativa ${selecionada ? "marcada" : ""} ${correta ? "correta" : ""} ${incorreta ? "incorreta" : ""}`}
+                        onClick={() => handleAlternativa(i, letra)}
+                      >
+                        <strong>{letra}.</strong> {alt}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            ))}
+            {!verificado && (
+              <button className="btn btn-success w-100 mt-3" onClick={verificarRespostas}>
+                Verificar Respostas
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

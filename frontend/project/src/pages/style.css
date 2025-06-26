@@ -1,0 +1,52 @@
+body {
+  background-color: #f9f9f9;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.alternativa {
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.alternativa:hover {
+  background-color: #f1f1f1;
+}
+
+.alternativa.marcada {
+  border-color: #007bff;
+  background-color: #e6f0ff;
+}
+
+.alternativa.correta {
+  background-color: #d4edda;
+  border-color: #28a745;
+  font-weight: bold;
+  color: #155724;
+}
+
+.alternativa.incorreta {
+  background-color: #f8d7da;
+  border-color: #dc3545;
+  color: #721c24;
+}
+
+.nav-link {
+  font-weight: 500;
+  color: #333;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+}
