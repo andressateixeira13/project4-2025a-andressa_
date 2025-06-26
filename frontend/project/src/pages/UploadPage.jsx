@@ -81,12 +81,17 @@ function UploadPage() {
 
   return (
     <div>
-      <header className="d-flex justify-content-between align-items-center p-3 border-bottom">
-        {usuario && (
-          <div className="d-flex align-items-center gap-2">
-            <img src={`https://github.com/${usuario.user_metadata?.user_name}.png`} className="user-avatar" />
-            <span>{usuario.user_metadata?.full_name}</span>
-            <button
+      <header className="p-3 border-bottom bg-white">
+        <div className="container-fluid d-flex justify-content-end align-items-center gap-3">
+            {usuario && (
+            <div className="d-flex align-items-center gap-2">
+                <img
+                src={`https://github.com/${usuario.user_metadata?.user_name}.png`}
+                alt="Avatar"
+                className="user-avatar"
+                />
+                <span>{usuario.user_metadata?.full_name}</span>
+                <button
                 className="btn btn-outline-danger btn-sm"
                 onClick={async () => {
                     await supabase.auth.signOut();
@@ -94,11 +99,11 @@ function UploadPage() {
                 }}
                 >
                 Sair
-            </button>
-
-          </div>
-        )}
-      </header>
+                </button>
+            </div>
+            )}
+        </div>
+        </header>
 
       <div className="container py-5">
         <h2 className="text-center mb-4">Gerador de Resumo e Questões</h2>
