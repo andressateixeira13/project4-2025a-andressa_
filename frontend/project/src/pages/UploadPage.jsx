@@ -79,15 +79,20 @@ function UploadPage() {
   return (
     <div>
       <header className="d-flex justify-content-between align-items-center p-3 border-bottom">
-        <div className="d-flex gap-3">
-          <a href="#" className="nav-link">Resumos Salvos</a>
-          <a href="#" className="nav-link">Novo Resumo</a>
-        </div>
         {usuario && (
           <div className="d-flex align-items-center gap-2">
             <img src={`https://github.com/${usuario.user_metadata?.user_name}.png`} className="user-avatar" />
             <span>{usuario.user_metadata?.full_name}</span>
-            <button className="btn btn-outline-danger btn-sm" onClick={() => supabase.auth.signOut()}>Sair</button>
+            <button
+                className="btn btn-outline-danger btn-sm"
+                onClick={async () => {
+                    await supabase.auth.signOut();
+                    navigate("/");
+                }}
+                >
+                Sair
+            </button>
+
           </div>
         )}
       </header>
