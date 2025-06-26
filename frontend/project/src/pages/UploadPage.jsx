@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { supabase } from "../services/supabase.js";
-//import "../style.css";
 
 function UploadPage() {
   const [usuario, setUsuario] = useState(null);
   const [arquivo, setArquivo] = useState(null);
+  const [texto, setTexto] = useState("");
   const [resumo, setResumo] = useState("");
   const [questoes, setQuestoes] = useState([]);
-  const [respostas, setRespostas] = useState({});
-  const [mostrarGabarito, setMostrarGabarito] = useState(false);
   const [carregando, setCarregando] = useState(false);
 
   useEffect(() => {
@@ -20,109 +18,112 @@ function UploadPage() {
     verificarLogin();
   }, []);
 
-  const handleUpload = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!arquivo) return alert("Selecione um arquivo PDF");
-    setCarregando(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", arquivo);
-      formData.append("user_id", usuario.id);
+    if (!usuario) return alert("Usuário não autenticado.");
 
-      const { data } = await axios.post(
-        "https://project4-2025a-andressa.onrender.com",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-      setResumo(data.resumo);
-      setQuestoes(data.questoes);
-      setMostrarGabarito(false);
-      setRespostas({});
-    } catch (error) {
-      alert("Erro ao enviar o arquivo.");
-      console.error(error);
+    setCarregando(true);
+    setResumo("");
+    setQuestoes([]);
+
+    try {
+      let response;
+
+      if (arquivo) {
+        const formData = new FormData();
+        formData.append("file", arquivo);
+        formData.append("user_id", usuario.id);
+
+        response = await axios.post(
+          "https://project4-2025a-andressa.onrender.com/upload",
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+      } else if (texto.trim()) {
+        response = await axios.post(
+          "https://project4-2025a-andressa.onrender.com/resumo-texto",
+          { user_id: usuario.id, texto }
+        );
+      } else {
+        alert("Envie um PDF ou digite um texto.");
+        return;
+      }
+
+      setResumo(response.data.resumo);
+      setQuestoes(response.data.questoes);
+    } catch (err) {
+      alert("Erro ao processar o conteúdo.");
+      console.error(err);
     } finally {
       setCarregando(false);
     }
   };
 
-  const handleResposta = (i, letra) => {
-    setRespostas({ ...respostas, [i]: letra });
-  };
-
-  const verificarRespostas = () => {
-    setMostrarGabarito(true);
-  };
-
   return (
-    <div className="container mt-5">
-      <h2 className="text-center mb-4">Upload de PDF e Geração de Questões</h2>
-      {usuario && (
-        <form onSubmit={handleUpload} className="text-center">
+    <div className="container py-5">
+      <h2 className="text-center mb-4">Gerador de Resumo e Questões</h2>
+
+      <form onSubmit={handleSubmit} className="mb-4">
+        <div className="mb-3">
+          <label className="form-label">Upload de PDF:</label>
           <input
             type="file"
             accept="application/pdf"
-            onChange={(e) => setArquivo(e.target.files[0])}
-            className="form-control mb-3"
+            className="form-control"
+            onChange={(e) => {
+              setArquivo(e.target.files[0]);
+              setTexto(""); // limpa o texto se PDF for enviado
+            }}
           />
-          <button className="btn btn-primary" disabled={carregando}>
-            {carregando ? "Processando..." : "Enviar e Gerar Questões"}
-          </button>
-        </form>
-      )}
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Ou digite o texto abaixo:</label>
+          <textarea
+            className="form-control"
+            rows="6"
+            value={texto}
+            placeholder="Cole seu texto aqui..."
+            onChange={(e) => {
+              setTexto(e.target.value);
+              setArquivo(null); // limpa o arquivo se texto for escrito
+            }}
+          />
+        </div>
+
+        <button className="btn btn-primary w-100" disabled={carregando}>
+          {carregando ? "Processando..." : "Gerar Resumo e Questões"}
+        </button>
+      </form>
 
       {resumo && (
-        <div className="mt-4">
+        <div className="mb-4">
           <h4>Resumo:</h4>
-          <p>{resumo}</p>
+          <div className="p-3 bg-light border rounded">{resumo}</div>
         </div>
       )}
 
       {questoes.length > 0 && (
-        <div className="mt-4">
+        <div>
           <h4>Questões:</h4>
           {questoes.map((q, i) => (
-            <div key={i} className="mb-3">
+            <div key={i} className="mb-3 p-3 border rounded bg-white">
               <strong>{i + 1}. {q.pergunta}</strong>
-              <div>
+              <ul className="mt-2">
                 {q.alternativas.map((alt, j) => {
                   const letra = String.fromCharCode(65 + j);
-                  const selecionada = respostas[i] === letra;
-                  const correta = q.correta === letra;
-
                   return (
-                    <div key={letra}>
-                      <label
-                        style={{
-                          color: mostrarGabarito
-                            ? correta
-                              ? "green"
-                              : selecionada
-                              ? "red"
-                              : "black"
-                            : "black"
-                        }}>
-                        <input
-                          type="radio"
-                          name={`questao-${i}`}
-                          value={letra}
-                          checked={selecionada}
-                          disabled={mostrarGabarito}
-                          onChange={() => handleResposta(i, letra)}
-                        /> {letra}) {alt}
-                      </label>
-                    </div>
+                    <li key={letra}>
+                      <strong>{letra}.</strong>{" "}
+                      <span style={{ color: letra === q.correta ? "green" : "inherit", fontWeight: letra === q.correta ? "bold" : "normal" }}>
+                        {alt}
+                      </span>
+                    </li>
                   );
                 })}
-              </div>
+              </ul>
             </div>
           ))}
-
-          {!mostrarGabarito && (
-            <button className="btn btn-success" onClick={verificarRespostas}>
-              Verificar Respostas
-            </button>
-          )}
         </div>
       )}
     </div>
