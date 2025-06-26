@@ -30,7 +30,7 @@ function UploadPage() {
       formData.append("user_id", usuario.id);
 
       const { data } = await axios.post(
-        "https://seu-backend-render.onrender.com/upload",
+        "https://project4-2025a-andressa.onrender.com",
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
