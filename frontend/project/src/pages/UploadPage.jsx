@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { supabase } from "../services/supabase.js";
-import "style.css";
+import "./style.css";
 
 function UploadPage() {
   const [usuario, setUsuario] = useState(null);
