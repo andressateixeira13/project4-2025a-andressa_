@@ -14,6 +14,7 @@ function UploadPage() {
   const [respostas, setRespostas] = useState({});
   const [verificado, setVerificado] = useState(false);
   const [carregando, setCarregando] = useState(false);
+  const [carregandoMais, setCarregandoMais] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -73,6 +74,7 @@ function UploadPage() {
 
   const gerarMaisQuestoes = async () => {
     if (!resumo || !usuario?.id) return alert("Resumo indisponível.");
+    setCarregandoMais(true);
 
     try {
       const response = await axios.post(
@@ -80,8 +82,8 @@ function UploadPage() {
         { user_id: usuario.id, texto: texto || resumo }
       );
 
-      const novas = response.data.questoes.filter((nova) =>
-        !todasQuestoes.some((q) => q.pergunta === nova.pergunta)
+      const novas = response.data.questoes.filter(
+        (nova) => !todasQuestoes.some((q) => q.pergunta === nova.pergunta)
       );
 
       if (novas.length === 0) {
@@ -96,6 +98,8 @@ function UploadPage() {
     } catch (err) {
       alert("Erro ao gerar novas questões.");
       console.error(err);
+    } finally {
+      setCarregandoMais(false);
     }
   };
 
@@ -210,13 +214,13 @@ function UploadPage() {
               </button>
             )}
             <button
-                className="btn btn-outline-primary w-100 mt-2"
-                onClick={gerarMaisQuestoes}
-                disabled={carregandoMais}
+              className="btn btn-secondary w-100 mt-2"
+              onClick={gerarMaisQuestoes}
+              disabled={carregandoMais}
             >
-                {carregandoMais ? "Processando..." : "Gerar mais questões"}
+              {carregandoMais ? "Processando..." : "Gerar Mais Questões"}
             </button>
-            </div>
+          </div>
         )}
       </div>
     </div>
