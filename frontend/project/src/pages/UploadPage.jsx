@@ -10,11 +10,11 @@ function UploadPage() {
   const [texto, setTexto] = useState("");
   const [resumo, setResumo] = useState("");
   const [questoes, setQuestoes] = useState([]);
+  const [todasQuestoes, setTodasQuestoes] = useState([]);
   const [respostas, setRespostas] = useState({});
   const [verificado, setVerificado] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const navigate = useNavigate();
-
 
   useEffect(() => {
     const verificarLogin = async () => {
@@ -33,6 +33,7 @@ function UploadPage() {
     setCarregando(true);
     setResumo("");
     setQuestoes([]);
+    setTodasQuestoes([]);
     setRespostas({});
     setVerificado(false);
 
@@ -61,11 +62,40 @@ function UploadPage() {
 
       setResumo(response.data.resumo);
       setQuestoes(response.data.questoes);
+      setTodasQuestoes(response.data.questoes);
     } catch (err) {
       alert("Erro ao processar o conteúdo.");
       console.error(err);
     } finally {
       setCarregando(false);
+    }
+  };
+
+  const gerarMaisQuestoes = async () => {
+    if (!resumo || !usuario?.id) return alert("Resumo indisponível.");
+
+    try {
+      const response = await axios.post(
+        "https://project4-2025a-andressa.onrender.com/resumo-texto",
+        { user_id: usuario.id, texto: texto || resumo }
+      );
+
+      const novas = response.data.questoes.filter((nova) =>
+        !todasQuestoes.some((q) => q.pergunta === nova.pergunta)
+      );
+
+      if (novas.length === 0) {
+        alert("Não foi possível gerar novas questões diferentes.");
+        return;
+      }
+
+      setQuestoes(novas);
+      setTodasQuestoes((prev) => [...prev, ...novas]);
+      setRespostas({});
+      setVerificado(false);
+    } catch (err) {
+      alert("Erro ao gerar novas questões.");
+      console.error(err);
     }
   };
 
@@ -83,27 +113,27 @@ function UploadPage() {
     <div>
       <header className="p-3 border-bottom bg-white">
         <div className="container-fluid d-flex justify-content-end align-items-center gap-3">
-            {usuario && (
+          {usuario && (
             <div className="d-flex align-items-center gap-2">
-                <img
+              <img
                 src={`https://github.com/${usuario.user_metadata?.user_name}.png`}
                 alt="Avatar"
                 className="user-avatar"
-                />
-                <span>{usuario.user_metadata?.full_name}</span>
-                <button
+              />
+              <span>{usuario.user_metadata?.full_name}</span>
+              <button
                 className="btn btn-outline-danger btn-sm"
                 onClick={async () => {
-                    await supabase.auth.signOut();
-                    navigate("/");
+                  await supabase.auth.signOut();
+                  navigate("/");
                 }}
-                >
+              >
                 Sair
-                </button>
+              </button>
             </div>
-            )}
+          )}
         </div>
-        </header>
+      </header>
 
       <div className="container py-5">
         <h2 className="text-center mb-4">Gerador de Resumo e Questões</h2>
@@ -179,6 +209,9 @@ function UploadPage() {
                 Verificar Respostas
               </button>
             )}
+            <button className="btn btn-secondary w-100 mt-2" onClick={gerarMaisQuestoes}>
+              Gerar Mais Questões
+            </button>
           </div>
         )}
       </div>

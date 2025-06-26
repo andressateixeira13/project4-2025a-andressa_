@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import multer from "multer";
 import dotenv from "dotenv";
-import fetch from "node-fetch";
 import { InferenceClient } from "@huggingface/inference";
 import { createClient } from "@supabase/supabase-js";
 import pkg from "pdfjs-dist/legacy/build/pdf.js";
@@ -19,8 +18,6 @@ app.use(express.json());
 const upload = multer({ storage: multer.memoryStorage() });
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 const hfClient = new InferenceClient(process.env.HF_TOKEN);
-console.log("HF_TOKEN:", process.env.HF_TOKEN ? "Token presente" : "Token ausente");
-
 
 // Extração de texto do PDF
 async function extrairTextoPDF(buffer) {
@@ -37,7 +34,9 @@ async function extrairTextoPDF(buffer) {
 // Gerando resumo
 async function gerarResumo(texto) {
   const prompt = `
-Você é um assistente inteligente. Resuma o conteúdo abaixo de forma clara, mantendo os principais pontos e informações relevantes. Evite repetir frases do texto, organize bem as ideias.
+Resuma o conteúdo abaixo de forma clara, mantendo os principais pontos e informações relevantes. Evite repetir frases do texto, organize bem as ideias.
+O resumo deve começar direto, sem frases introdutórias como "Aqui está..." ou "O resumo é:". Se quiser, pode usar títulos e marcadores para organizar melhor as informações.
+Não use marcações como asteriscos (*), negrito (**), markdown ou emojis. Apenas texto simples.
 
 Texto:
 """${texto}"""
@@ -47,7 +46,7 @@ Texto:
     const response = await hfClient.chatCompletion({
       provider: "novita",
       model: "meta-llama/Meta-Llama-3-8B-Instruct",
-      messages: [{ role: "user", content: prompt }]
+      messages: [{ role: "user", content: prompt }],
     });
 
     return response.choices?.[0]?.message?.content.trim() || "Resumo indisponível.";
@@ -56,7 +55,6 @@ Texto:
     return "Erro ao gerar resumo.";
   }
 }
-
 
 // Gerando questões
 async function gerarQuestoes(resumo) {
@@ -72,8 +70,7 @@ A saída deve ser apenas um array JSON válido, como no exemplo abaixo:
     "pergunta": "Qual é a função da fotossíntese?",
     "alternativas": ["Produzir energia", "Absorver água", "Gerar luz", "Transportar seiva"],
     "correta": "A"
-  },
-  ...
+  }
 ]
 
 Não inclua explicações ou texto fora do JSON. Apenas o JSON puro.
@@ -83,7 +80,7 @@ Não inclua explicações ou texto fora do JSON. Apenas o JSON puro.
     const response = await hfClient.chatCompletion({
       provider: "novita",
       model: "meta-llama/Meta-Llama-3-8B-Instruct",
-      messages: [{ role: "user", content: prompt }]
+      messages: [{ role: "user", content: prompt }],
     });
 
     const content = response.choices?.[0]?.message?.content || "";
@@ -129,6 +126,23 @@ app.post('/resumo-texto', async (req, res) => {
   }
 });
 
+// POST /mais-questoes sem repetir
+app.post('/mais-questoes', async (req, res) => {
+  const { resumo, questoesExistentes } = req.body;
+  if (!resumo) return res.status(400).send("Resumo ausente.");
+
+  try {
+    const novas = await gerarQuestoes(resumo);
+    const diferentes = novas.filter(q =>
+      !questoesExistentes.some(eq => eq.pergunta.trim() === q.pergunta.trim())
+    );
+    res.json({ novasQuestoes: diferentes });
+  } catch (err) {
+    console.error("Erro ao gerar mais questões:", err);
+    res.status(500).send("Erro ao gerar mais questões.");
+  }
+});
+
 app.listen(port, () => {
-  console.log(`Servidor rodando`);
+  console.log(`Servidor rodando na porta ${port}`);
 });
