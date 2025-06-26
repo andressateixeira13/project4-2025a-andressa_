@@ -4,10 +4,27 @@ body {
 }
 
 .user-avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+header {
+  background-color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.btn-outline-danger.btn-sm {
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-danger.btn-sm:hover {
+  background-color: #dc3545;
+  color: white;
 }
 
 .alternativa {
