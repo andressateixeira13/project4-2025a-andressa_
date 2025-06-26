@@ -209,10 +209,14 @@ function UploadPage() {
                 Verificar Respostas
               </button>
             )}
-            <button className="btn btn-secondary w-100 mt-2" onClick={gerarMaisQuestoes}>
-              Gerar Mais Questões
+            <button
+                className="btn btn-outline-primary w-100 mt-2"
+                onClick={gerarMaisQuestoes}
+                disabled={carregandoMais}
+            >
+                {carregandoMais ? "Processando..." : "Gerar mais questões"}
             </button>
-          </div>
+            </div>
         )}
       </div>
     </div>
