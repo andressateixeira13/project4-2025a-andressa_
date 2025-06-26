@@ -43,7 +43,7 @@ function ResumosView() {
   return (
     <div>
       <header className="p-3 border-bottom bg-white">
-        <div className="container-fluid d-flex justify-content-end align-items-center gap-3">
+        <div className="container-fluid d-flex justify-content-between align-items-center gap-3">
             <div className="d-flex align-items-center gap-2">
             <button
               className="btn btn-outline-primary btn-sm"
