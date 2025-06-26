@@ -19,6 +19,8 @@ app.use(express.json());
 const upload = multer({ storage: multer.memoryStorage() });
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 const hfClient = new InferenceClient(process.env.HF_TOKEN);
+console.log("HF_TOKEN:", process.env.HF_TOKEN ? "Token presente" : "Token ausente");
+
 
 // Extração de texto do PDF
 async function extrairTextoPDF(buffer) {
