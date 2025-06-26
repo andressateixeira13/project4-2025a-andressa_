@@ -24,6 +24,7 @@ Gerador de Resumos e Questões de multipla escolha.
 - React/Vite
 - Node.js
 - Supabase
+- IA: Meta-Llama-3-8B-Instruct
 
 #### Ambiente de desenvolvimento
 - VS Code
