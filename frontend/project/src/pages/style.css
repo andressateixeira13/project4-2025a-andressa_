@@ -27,6 +27,15 @@ header {
   color: white;
 }
 
+.btn-outline-primary.btn-sm {
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-primary.btn-sm:hover {
+  background-color: #007bff;
+  color: white;
+}
+
 .alternativa {
   padding: 10px;
   margin: 5px 0;
@@ -66,4 +75,38 @@ header {
 
 .nav-link:hover {
   text-decoration: underline;
+}
+
+.container-fluid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resumo-box {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.resumo-box:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.resumo-cabecalho p {
+  color: #555;
+}
+
+.resumo-detalhes {
+  background-color: #fff;
+  border-top: 1px solid #ccc;
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
+.resumo-cabecalho {
+  cursor: pointer;
 }
