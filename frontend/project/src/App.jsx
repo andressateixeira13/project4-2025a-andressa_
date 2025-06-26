@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "./services/supabase.js";
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import UploadPage from "./pages/UploadPage.jsx";
+import ResumosView from "./pages/ResumosView.jsx";
 
 function LoginPage({ onLogin }) {
   const [carregando, setCarregando] = useState(false);
@@ -60,6 +61,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<AuthWrapper />} />
         <Route path="/upload" element={<UploadPage />} />
+        <Route path="/resumos" element={<ResumosView />}/>
       </Routes>
     </Router>
   );
