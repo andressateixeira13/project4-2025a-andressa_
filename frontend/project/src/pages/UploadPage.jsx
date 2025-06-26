@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { supabase } from "./services/supabase";
+import { supabase } from "./services/supabase.js";
 import "./style.css";
 
 function UploadPage() {

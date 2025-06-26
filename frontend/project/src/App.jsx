@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { supabase } from "./services/supabase";
+import { supabase } from "./services/supabase.js";
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
-import UploadPage from "./pages/UploadPage";
+import UploadPage from "./pages/UploadPage.jsx";
 
 function LoginPage({ onLogin }) {
   const [carregando, setCarregando] = useState(false);
