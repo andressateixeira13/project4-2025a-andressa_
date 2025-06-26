@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { supabase } from "../services/supabase.js";
+import { useNavigate } from "react-router-dom";
 import "./style.css";
 
 function UploadPage() {
@@ -12,6 +13,8 @@ function UploadPage() {
   const [respostas, setRespostas] = useState({});
   const [verificado, setVerificado] = useState(false);
   const [carregando, setCarregando] = useState(false);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     const verificarLogin = async () => {
