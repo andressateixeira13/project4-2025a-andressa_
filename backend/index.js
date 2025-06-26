@@ -36,25 +36,34 @@ async function extrairTextoPDF(buffer) {
 
 // Gerando resumo
 async function gerarResumo(texto) {
-  const response = await fetch("https://api-inference.huggingface.co/models/facebook/bart-large-cnn", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.HF_TOKEN}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ inputs: texto.slice(0, 2048) })
-  });
+  const prompt = `
+Você é um assistente inteligente. Resuma o conteúdo abaixo de forma clara, mantendo os principais pontos e informações relevantes. Evite repetir frases do texto, organize bem as ideias.
 
-  const data = await response.json();
-  return data[0]?.summary_text || "Resumo indisponível.";
+Texto:
+"""${texto}"""
+`;
+
+  try {
+    const response = await hfClient.chatCompletion({
+      provider: "novita",
+      model: "meta-llama/Meta-Llama-3-8B-Instruct",
+      messages: [{ role: "user", content: prompt }]
+    });
+
+    return response.choices?.[0]?.message?.content.trim() || "Resumo indisponível.";
+  } catch (error) {
+    console.error("Erro ao gerar resumo:", error);
+    return "Erro ao gerar resumo.";
+  }
 }
+
 
 // Gerando questões
 async function gerarQuestoes(resumo) {
   const prompt = `
 Resumo: """${resumo}"""
 
-Crie exatamente 3 questões de múltipla escolha com 4 alternativas cada (A, B, C, D), baseadas no resumo acima.
+Crie até 5 questões de múltipla escolha com 4 alternativas cada (A, B, C, D), baseadas no resumo acima.
 
 A saída deve ser apenas um array JSON válido, como no exemplo abaixo:
 
